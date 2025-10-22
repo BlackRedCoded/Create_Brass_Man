@@ -14,7 +14,25 @@ import java.util.List;
 public class JarvisCommunicatorItem extends ArmorItem {
 
     public JarvisCommunicatorItem(Holder<ArmorMaterial> material, Properties properties) {
-        super(material, Type.HELMET, properties.durability(0)); // No durability, just wearable
+        super(material, Type.HELMET, properties); // Fixed: Added properties parameter
+    }
+
+    public boolean canBeDepleted() {
+        return false; // Cannot lose durability
+    }
+
+    public boolean isDamageableItem() {
+        return false; // Not damageable
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return 0; // No max damage to take
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack stack) {
+        return false; // Hide durability bar
     }
 
     @Override
