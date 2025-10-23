@@ -3,14 +3,17 @@
   "accept_mirrored": false,
   "pattern": [
     " KMK ",
-    "KBABK",
-    "SDCDS",
-    "KBABK",
+    "KBCBK",
+    "SDADS",
+    "KBJBK",
     " KMK "
   ],
   "key": {
     "C": {
       "item": "brassmanmod:brass_helmet"
+    },
+    "J": {
+      "item": "brassmanmod:jarvis_communicator"
     },
     "M": {
       "item": "brassmanmod:compact_mechanism"

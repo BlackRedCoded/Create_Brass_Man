@@ -6,6 +6,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.blackredcoded.brassmanmod.blockentity.AirCompressorBlockEntity;
 import net.blackredcoded.brassmanmod.blockentity.BrassArmorStandBlockEntity;
 import net.blackredcoded.brassmanmod.config.FlightConfig;
@@ -29,14 +31,25 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class JarvisCommand {
-
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("jarvis")
+                // NO .requires() - show to everyone but check access in methods
+                .executes(context -> {
+                    ServerPlayer player = context.getSource().getPlayer();
+                    if (player == null || !hasJarvisAccess(player)) {
+                        player.sendSystemMessage(Component.literal("JARVIS: Access denied. Requires Brass Man helmet or JARVIS Communicator.")
+                                .withStyle(ChatFormatting.RED));
+                        return 0;
+                    }
+                    return showStatus(context);
+                })
                 .then(Commands.literal("call")
                         .executes(JarvisCommand::callSuit) // /jarvis call (nearest suit)
                         .then(Commands.argument("setName", StringArgumentType.greedyString())
+                                .suggests(JarvisCommand::suggestSuitNames)
                                 .executes(JarvisCommand::callNamedSuit))) // /jarvis call "Set Name"
                 .then(Commands.literal("list")
                         .executes(JarvisCommand::listSuits) // /jarvis list (all suits, names only)
@@ -83,6 +96,31 @@ public class JarvisCommand {
         ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
         return helmet.getItem() instanceof BrassManHelmetItem ||
                 helmet.getItem() instanceof JarvisCommunicatorItem;
+    }
+
+    private static CompletableFuture<Suggestions> suggestSuitNames(CommandContext<CommandSourceStack> context,
+                                                                   SuggestionsBuilder builder) {
+        ServerPlayer player = context.getSource().getPlayer();
+        if (player == null) {
+            return builder.buildFuture(); // Return empty suggestions if no player
+        }
+
+        // Check if player has JARVIS access (same check as in other commands)
+        if (!JarvisCommunicatorItem.hasJarvis(player)) {
+            return builder.buildFuture(); // No suggestions without JARVIS access
+        }
+
+        // Get all available suits using the SAME method as /jarvis list
+        List<SuitInfo> suits = findPlayerSuits(player);
+
+        // Add each suit name as a suggestion
+        for (SuitInfo suit : suits) {
+            if (suit.setName != null && !suit.setName.isEmpty()) {
+                builder.suggest(suit.setName); // Add this suit name to suggestions
+            }
+        }
+
+        return builder.buildFuture(); // Return the built suggestions
     }
 
     private static int toggleFlight(CommandContext<CommandSourceStack> context) {
