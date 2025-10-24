@@ -71,12 +71,14 @@ public class FlightHandler {
             return;
         }
 
+        // REMOVED: All the aggressive fall damage prevention logic - now handled by FlightFallDamageHandler
+
         // === ICING PROBLEM LOGIC ===
         boolean isAbove500 = player.getY() >= 500;
         int upgradeStage = ArmorUpgradeHelper.getRemoteAssemblyLevel(chestplate);
 
         // Check if player is iced (above Y:500 with upgrade stage 0)
-        boolean isIced = isAbove500 && upgradeStage == 0 && !ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.chestplate, ArmorStyleHelper.AQUA);
+        boolean isIced = isAbove500 && upgradeStage == 0 && !ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getChestplate(), ArmorStyleHelper.AQUA);
 
         // Grant achievement when first entering icing zone
         if (isIced && !wasAbove500) {
@@ -176,9 +178,9 @@ public class FlightHandler {
         }
 
         // Ocean style allows water flight
-        boolean canFlyInWater = isInWater && ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.chestplate, ArmorStyleHelper.DARK_AQUA);
+        boolean canFlyInWater = isInWater && ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getChestplate(), ArmorStyleHelper.DARK_AQUA);
         // Flaming style allows lava flight
-        boolean canFlyInLava = isInLava && ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.chestplate, ArmorStyleHelper.FLAMING);
+        boolean canFlyInLava = isInLava && ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getChestplate(), ArmorStyleHelper.FLAMING);
         boolean canFly = isInAir || canFlyInWater || canFlyInLava;
 
         // FLIGHT: Space pressed + flight enabled + MUST BE IN AIR
@@ -187,7 +189,7 @@ public class FlightHandler {
                 startFlying(player);
             }
 
-            player.fallDistance = 0;
+            // REMOVED: player.fallDistance = 0; - now handled by FlightFallDamageHandler
             airConsumeTicks++;
             if (airConsumeTicks >= ticksPerAir) {
                 PacketDistributor.sendToServer(new ConsumeAirPacket(1));
@@ -216,7 +218,7 @@ public class FlightHandler {
         // HOVER: In air + hover enabled
         else if (isInAir && airAmount > 0 && config.hoverEnabled) {
             floatingTicks++;
-            player.fallDistance = 0;
+            // REMOVED: player.fallDistance = 0; - now handled by FlightFallDamageHandler
 
             if (floatingTicks % 40 == 0) {
                 PacketDistributor.sendToServer(new ConsumeAirPacket(1));
@@ -224,10 +226,11 @@ public class FlightHandler {
 
             if (shiftPressed) {
                 Vec3 currentMovement = player.getDeltaMovement();
-                double baseSink = -0.6;
-                double accelPerTick = -0.008;
+                // FIXED: Made descending slower (half speed)
+                double baseSink = -0.3; // Was -0.6
+                double accelPerTick = -0.004; // Was -0.008
                 double sinkSpeed = baseSink + (floatingTicks * accelPerTick);
-                sinkSpeed = Math.max(sinkSpeed, -3.2);
+                sinkSpeed = Math.max(sinkSpeed, -1.6); // Was -3.2
                 player.setDeltaMovement(
                         currentMovement.x * 0.9,
                         sinkSpeed,
@@ -312,5 +315,14 @@ public class FlightHandler {
 
     public static void setEvent(ClientTickEvent.Post event) {
         FlightHandler.event = event;
+    }
+
+    // Getter methods for external use (needed by FlightFallDamageHandler)
+    public static boolean isFlying() {
+        return isFlying;
+    }
+
+    public static int getFloatingTicks() {
+        return floatingTicks;
     }
 }

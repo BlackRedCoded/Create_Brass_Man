@@ -76,7 +76,7 @@ public class BrassManBootsItem extends ArmorItem {
     @Override
     public boolean canWalkOnPowderedSnow(ItemStack stack, net.minecraft.world.entity.LivingEntity wearer) {
         if (wearer instanceof Player player) {
-            return ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.boots, ArmorStyleHelper.AQUA);
+            return ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getBoots(), ArmorStyleHelper.AQUA);
         }
         return false;
     }

@@ -6,21 +6,46 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 
 public class ArmorStyleHelper {
 
-    static LocalPlayer player = Minecraft.getInstance().player;
     public static final String BRASS = "brass";
     public static final String AQUA = "aqua";
     public static final String DARK_AQUA = "darkaqua";
     public static final String FLAMING = "flaming";
-    public static final ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
-    public static final ItemStack chestplate = player.getItemBySlot(EquipmentSlot.CHEST);
-    public static final ItemStack leggings = player.getItemBySlot(EquipmentSlot.LEGS);
-    public static final ItemStack boots = player.getItemBySlot(EquipmentSlot.FEET);
+
+    // Safe getter methods instead of static fields
+    private static LocalPlayer getPlayer() {
+        return Minecraft.getInstance().player;
+    }
+
+    public static ItemStack getHelmet() {
+        LocalPlayer player = getPlayer();
+        return player != null ? player.getItemBySlot(EquipmentSlot.HEAD) : ItemStack.EMPTY;
+    }
+
+    public static ItemStack getChestplate() {
+        LocalPlayer player = getPlayer();
+        return player != null ? player.getItemBySlot(EquipmentSlot.CHEST) : ItemStack.EMPTY;
+    }
+
+    public static ItemStack getLeggings() {
+        LocalPlayer player = getPlayer();
+        return player != null ? player.getItemBySlot(EquipmentSlot.LEGS) : ItemStack.EMPTY;
+    }
+
+    public static ItemStack getBoots() {
+        LocalPlayer player = getPlayer();
+        return player != null ? player.getItemBySlot(EquipmentSlot.FEET) : ItemStack.EMPTY;
+    }
+
+    // For backwards compatibility with your existing code
+    public static ItemStack helmet() { return getHelmet(); }
+    public static ItemStack chestplate() { return getChestplate(); }
+    public static ItemStack leggings() { return getLeggings(); }
+    public static ItemStack boots() { return getBoots(); }
 
     public static String getArmorStyle(ItemStack stack) {
         if (stack.isEmpty()) return BRASS;
@@ -29,7 +54,7 @@ public class ArmorStyleHelper {
     }
 
     public static boolean hasArmorStyle(Player player, ItemStack armorItem, String armorStyle) {
-        ItemStack chestplate = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
+        ItemStack chestplate = player.getItemBySlot(EquipmentSlot.CHEST);
         String currentStyle = getArmorStyle(chestplate);
         return currentStyle.equalsIgnoreCase(armorStyle);
     }

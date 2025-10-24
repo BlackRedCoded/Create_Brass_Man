@@ -260,13 +260,13 @@ public class BrassManChestplateItem extends ArmorItem {
     private void applyStyleEffects(Player player) {
         boolean fullFlamingArmor;
 
-        fullFlamingArmor = ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.boots, ArmorStyleHelper.FLAMING) &&
-                ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.leggings, ArmorStyleHelper.FLAMING) &&
-                ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.chestplate, ArmorStyleHelper.FLAMING) &&
-                ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.helmet, ArmorStyleHelper.FLAMING);
+        fullFlamingArmor = ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getBoots(), ArmorStyleHelper.FLAMING) &&
+                ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getLeggings(), ArmorStyleHelper.FLAMING) &&
+                ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getChestplate(), ArmorStyleHelper.FLAMING) &&
+                ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getHelmet(), ArmorStyleHelper.FLAMING);
 
         // Iced/Aqua Style: Prevent freezing completely
-        if (ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.chestplate, ArmorStyleHelper.AQUA)) {
+        if (ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getChestplate(), ArmorStyleHelper.AQUA)) {
             // Remove freezing damage by resetting frozen ticks
             if (player.getTicksFrozen() > 0) {
                 player.setTicksFrozen(0);
@@ -276,7 +276,7 @@ public class BrassManChestplateItem extends ArmorItem {
         }
 
         // Ocean Style: Water Breathing + Night Vision underwater
-        if (ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.helmet, ArmorStyleHelper.DARK_AQUA)) {
+        if (ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getHelmet(), ArmorStyleHelper.DARK_AQUA)) {
             if (player.isInWater()) {
                 player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
                         net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20, 0, false, false));
@@ -286,7 +286,7 @@ public class BrassManChestplateItem extends ArmorItem {
         }
 
         // Flaming Style: Night Vision if player has helmet
-        if (ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.helmet, ArmorStyleHelper.FLAMING) && player.isInLava()) {
+        if (ArmorStyleHelper.hasArmorStyle(player, ArmorStyleHelper.getHelmet(), ArmorStyleHelper.FLAMING) && player.isInLava()) {
             player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
                     net.minecraft.world.effect.MobEffects.NIGHT_VISION, 20, 0, false, false));
         }
