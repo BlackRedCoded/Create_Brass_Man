@@ -374,7 +374,7 @@ public class JarvisCommand {
         suit.armorStand.setArmor(3, ItemStack.EMPTY);
 
         String message = suit.setName != null && !suit.setName.isEmpty()
-                ? "JARVIS: Deploying \"" + suit.setName + "\", sir."
+                ? "JARVIS: Deploying " + suit.setName + ", sir."
                 : "JARVIS: Deploying suit, sir.";
         player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.GOLD));
     }

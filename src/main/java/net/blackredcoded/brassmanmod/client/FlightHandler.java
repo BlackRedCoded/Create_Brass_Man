@@ -31,6 +31,8 @@ import net.minecraft.world.level.material.Fluids;
 public class FlightHandler {
     private static ClientTickEvent.Post event;
     private static boolean isFlying = false;
+    private static boolean wasFlying = false;
+    private static boolean isHovering = false;
     private static boolean fallsaveTriggered = false;
     private static boolean firstFlightGranted = false;
     private static boolean wasAbove500 = false;
@@ -50,7 +52,7 @@ public class FlightHandler {
         ItemStack chestplate = player.getItemBySlot(EquipmentSlot.CHEST);
 
         // === FALLSAVE CHECK (BEFORE CHESTPLATE CHECK - WORKS WITH JUST JARVIS ACCESS) ===
-        if (!player.onGround() && player.getDeltaMovement().y < -0.5) {
+        if (!player.onGround() && player.getDeltaMovement().y < -0.5 && !isFlying && !isHovering) {
             if (!fallsaveTriggered && isFalling(player)) {
                 if (JarvisCommunicatorItem.hasJarvis(player)) {
                     PacketDistributor.sendToServer(new FallsavePacket());
@@ -70,8 +72,6 @@ public class FlightHandler {
             stopFlying(player);
             return;
         }
-
-        // REMOVED: All the aggressive fall damage prevention logic - now handled by FlightFallDamageHandler
 
         // === ICING PROBLEM LOGIC ===
         boolean isAbove500 = player.getY() >= 500;
@@ -189,7 +189,6 @@ public class FlightHandler {
                 startFlying(player);
             }
 
-            // REMOVED: player.fallDistance = 0; - now handled by FlightFallDamageHandler
             airConsumeTicks++;
             if (airConsumeTicks >= ticksPerAir) {
                 PacketDistributor.sendToServer(new ConsumeAirPacket(1));
@@ -218,7 +217,7 @@ public class FlightHandler {
         // HOVER: In air + hover enabled
         else if (isInAir && airAmount > 0 && config.hoverEnabled) {
             floatingTicks++;
-            // REMOVED: player.fallDistance = 0; - now handled by FlightFallDamageHandler
+            isHovering = true;
 
             if (floatingTicks % 40 == 0) {
                 PacketDistributor.sendToServer(new ConsumeAirPacket(1));
@@ -248,8 +247,13 @@ public class FlightHandler {
             player.setSwimming(false);
             spawnParticles(player);
         } else {
+            isHovering = false;
             stopFlying(player);
         }
+    }
+
+    public static boolean wasRecentlyFlying() {
+        return wasFlying;
     }
 
     private static void spawnParticles(LocalPlayer player) {
@@ -301,11 +305,22 @@ public class FlightHandler {
 
     private static void stopFlying(LocalPlayer player) {
         if (isFlying) {
+            wasFlying = true;
             isFlying = false;
             floatingTicks = 0;
             airConsumeTicks = 0;
             player.setPose(Pose.STANDING);
             player.setSwimming(false);
+
+            // Reset wasFlying after a short delay
+            Minecraft.getInstance().execute(() -> {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(600); // 0.6 seconds
+                        wasFlying = false;
+                    } catch (InterruptedException ignored) {}
+                }).start();
+            });
         }
     }
 
@@ -320,6 +335,10 @@ public class FlightHandler {
     // Getter methods for external use (needed by FlightFallDamageHandler)
     public static boolean isFlying() {
         return isFlying;
+    }
+
+    public static boolean isHovering() {
+        return isHovering;
     }
 
     public static int getFloatingTicks() {

@@ -21,7 +21,7 @@
       "conditions": {
         "items": [
           {
-            "items": "brassmanmod:brass_helmet"
+            "items": "brassmanmod:brass_man_helmet"
           }
         ]
       }
@@ -39,7 +39,7 @@
   },
   "requirements": [
     [
-      "brass_helmet",
+      "brass_man_helmet",
       "jarvis_communicator"
     ]
   ]

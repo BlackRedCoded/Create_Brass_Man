@@ -38,7 +38,7 @@ public class JarvisCommunicatorItem extends ArmorItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.literal("Enables JARVIS AI assistance").withStyle(ChatFormatting.AQUA));
-        tooltip.add(Component.literal("Wear in head slot for access").withStyle(ChatFormatting.GOLD));
+        tooltip.add(Component.literal("Wear in head slot for Jarvis access").withStyle(ChatFormatting.GOLD));
         tooltip.add(Component.literal("Commands, warnings, and flight control").withStyle(ChatFormatting.GRAY));
     }
 
