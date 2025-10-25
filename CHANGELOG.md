@@ -1,13 +1,22 @@
-# Changelog
+# Create: Brass Man
 
-All notable changes to Create: Brass Man will be documented in this file.
+## [1.1] - 2025-10-25
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/),
-and this project adheres to [Semantic Versioning](https://semver.org/).
+### Initial Fixes
 
----
+- #### Fixes
+  - Fixed Crashing when loading world
+  - Fixed getting "Jarvis Online" achievement when acquiring a Brass helmet
+  - Fixed stage 2 armor sets not finding their assigned armor stand over long distances
+  - Fixed fall damage when slowly landing
+  - Fixed Jarvis Communicator item breaking one hit
+  - Fixed jarvis triggering Fall-save when flying or landing
+  - Fixed jarvis communicator - curios implementation, jarvis communicator now goes into curios "head" slot
 
-## [1.0.0] - 2025-10-19
+- #### Improvements
+  - improved jarvis commands by adding available suit suggestions
+
+## [1.0] - 2025-10-19
 
 ### Initial Release
 
